@@ -5,11 +5,10 @@ set -euo pipefail
 # 1) export GITHUB_TOKEN or GH_TOKEN
 # 2) export GITHUB_OWNER (e.g., your username/org)
 # 3) export VERCEL_TOKEN
-# 4) bash ./scripts/deploy-qs-candidate-academy.sh
+# 4) bash ./deploy-qs-candidate-academy.sh
 
 REPO_NAME="qs-candidate-academy"
-OWNER="${GITHUB_OWNER}"
-REPO="${GITHUB_TOKEN:+${OWNER}/${REPO_NAME}}"
+OWNER="${GITHUB_OWNER:-}"
 
 if [[ -z "$OWNER" ]]; then
   echo "Missing GITHUB_OWNER."
@@ -30,16 +29,21 @@ if ! command -v node >/dev/null 2>&1 || ! command -v npm >/dev/null 2>&1; then
 fi
 
 printf "Creating GitHub repo %s/%s...\n" "$OWNER" "$REPO_NAME"
-npx --yes gh api \
+
+if ! npx --yes gh api \
   -X POST /user/repos \
   -H "Authorization: token $GITHUB_TOKEN" \
-  -f name="$REPO_NAME" -f private=false >/tmp/qs_create_repo.json
+  -f name="$REPO_NAME" -f private=false >/tmp/qs_create_repo.json; then
+  echo "Repo creation failed. Ensure token is valid and has repository creation permission."
+  exit 1
+fi
 
 git remote remove origin 2>/dev/null || true
 git remote add origin "https://github.com/$OWNER/$REPO_NAME.git"
 git push -u origin main
 
-echo "Pushing completed. Deploying to Vercel..."
+echo "Pushing completed."
+
 if [[ -z "${VERCEL_TOKEN:-}" ]]; then
   echo "Missing VERCEL_TOKEN; skipping deploy."
   exit 1
