@@ -1,0 +1,17 @@
+/.DS_Store
+/node_modules/
+/.venv/
+/.vscode/
+/.idea/
+/.next/
+/dist/
+/build/
+/coverage/
+/.env
+/.env.local
+/.env.*.local
+/.npm/
+/.yarn/
+/tmp/
+/.omx/
+*.log

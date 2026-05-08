@@ -2,6 +2,9 @@
   "version": 2,
   "public": true,
   "cleanUrls": true,
-  "buildCommand": "echo 'No build step'",
-  "outputDirectory": "."
+  "functions": {
+    "api/submit-share.js": {
+      "runtime": "nodejs20.x"
+    }
+  }
 }
